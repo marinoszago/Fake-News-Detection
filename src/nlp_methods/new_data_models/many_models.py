@@ -11,6 +11,8 @@ from sklearn.metrics import accuracy_score,classification_report
 import seaborn as sns
 from sklearn import preprocessing
 from sklearn.svm import SVC
+from sklearn.tree import DecisionTreeClassifier
+
 
 def LogisticRegressionModel(df,scaler):
 
@@ -39,6 +41,7 @@ def LogisticRegressionModel(df,scaler):
     all_sample_title = 'Accuracy Score: {0}'.format(score)
     plt.title(all_sample_title, size=15)
     plt.show()
+
 
 def NaiveBayesModel(df,scaler):
 
@@ -70,6 +73,7 @@ def NaiveBayesModel(df,scaler):
     plt.title(all_sample_title, size=15)
     plt.show()
 
+
 def RandomForestModel(df,scaler):
     X = df.iloc[:, 0:27].values
     y = df.iloc[:, 27].values
@@ -98,6 +102,7 @@ def RandomForestModel(df,scaler):
     all_sample_title = 'Accuracy Score: {0}'.format(score)
     plt.title(all_sample_title, size=15)
     plt.show()
+
 
 def SMVModel(df,scaler):
     X = df.iloc[:, 0:27].values
@@ -129,11 +134,43 @@ def SMVModel(df,scaler):
     plt.show()
 
 
+def DecisionTreeModel(df,scaler):
+    X = df.iloc[:, 0:27].values
+    y = df.iloc[:, 27].values
+
+    X = preprocessing.normalize(X)
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.25, random_state=7, shuffle=True)
+
+    X_train = scaler.fit_transform(X_train)
+    X_test = scaler.transform(X_test)
+
+    dtree_model = DecisionTreeClassifier(max_depth=3, criterion='gini').fit(X_train, y_train)
+
+    y_pred = dtree_model.predict(X_test)
+
+    conf_mat = confusion_matrix(y_test, y_pred)
+    score = dtree_model.score(X_test, y_test)
+    print(score)
+    print(conf_mat)
+    print(classification_report(y_test, y_pred, digits=3))
+    plt.figure(figsize=(9, 9))
+    sns.heatmap(conf_mat, annot=True, fmt=".3f", linewidths=.5, square=True, cmap='Blues_r')
+    plt.ylabel('Actual label')
+    plt.xlabel('Predicted label')
+    all_sample_title = 'Accuracy Score: {0}'.format(score)
+    plt.title(all_sample_title, size=15)
+    plt.show()
+
+
+
 if __name__=='__main__':
-    df = pd.read_csv('F:\\zagkotsis\\data\\nlp_data_with_annotations\\new_nlp_data.csv')
+    df = pd.read_csv('../../../data/nlp_data_with_annotations/new_nlp_data.csv').tail(100)
     sc = StandardScaler()
     mm = preprocessing.MinMaxScaler()
+
     # LogisticRegressionModel(df,sc)
     # NaiveBayesModel(df,mm)
     # RandomForestModel(df,sc)
-    SMVModel(df,sc)
+    # SMVModel(df,sc)
+    # DecisionTreeModel(df, sc)
